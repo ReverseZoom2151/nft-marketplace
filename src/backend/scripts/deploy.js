@@ -1,7 +1,7 @@
 const hre = require("hardhat");
+const fs = require("fs");
 
 async function main() {
-
   const [deployer] = await hre.ethers.getSigners();
 
   console.log("Deploying contracts with the account:", deployer.address);
@@ -9,18 +9,18 @@ async function main() {
 
   const NFT = await hre.ethers.getContractFactory("NFT");
   const nft = await NFT.deploy();
+
   const Marketplace = await hre.ethers.getContractFactory("Marketplace");
   const marketplace = await Marketplace.deploy(1);
 
   console.log("NFT address:", nft.address);
   console.log("Marketplace address:", marketplace.address);
-  
+
   saveFrontendFiles(nft, "NFT");
   saveFrontendFiles(marketplace, "Marketplace");
 }
 
 function saveFrontendFiles(contract, name) {
-  const fs = require("fs");
   const contractsDir = __dirname + "/../../frontend/contractsData";
 
   if (!fs.existsSync(contractsDir)) {
@@ -32,7 +32,7 @@ function saveFrontendFiles(contract, name) {
     JSON.stringify({ address: contract.address }, undefined, 2)
   );
 
-  const contractArtifact = fs.artifacts.readArtifactSync(name);
+  const contractArtifact = hre.artifacts.readArtifactSync(name);
 
   fs.writeFileSync(
     contractsDir + `/${name}.json`,
@@ -46,3 +46,4 @@ main()
     console.error(error);
     process.exit(1);
   });
+
